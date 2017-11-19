@@ -11,7 +11,10 @@ class ARed {
 
         this._readCommands = {
             get: true,
-            mget: true
+            mget: true,
+            hgetall: true,
+            pfcount: true,
+            smembers: true
         }
 
         this._agent = new http.Agent({keepAlive: true})
