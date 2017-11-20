@@ -1,8 +1,10 @@
+"use strict"
+
 const http = require("http")
 
 const redis = require("redis")
 
-const Helper = require(`${__base}libs/helper`)
+const Helper = require("./helper")
 
 class ARed {
     constructor() {

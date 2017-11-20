@@ -1,3 +1,7 @@
+# 2017-11-19, v0.0.3
+* Added example to README.md
+* Made sure library does not depend on globals
+
 # 2017-11-19, v0.0.2
 
 * Added CHANGELOG.md
