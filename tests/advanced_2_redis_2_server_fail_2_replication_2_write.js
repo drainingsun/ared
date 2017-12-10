@@ -95,26 +95,36 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
     })
 
     it("Should set 'foo' with value 'bar' for the remaining server and redis", (done) => {
-        ared3.exec("set", ["foo", "bar"], (err, result) => {
-            for (let clientId in err) {
-                if (err.hasOwnProperty(clientId)) {
-                    for (let clientId2 in err[clientId]) {
-                        if (err[clientId].hasOwnProperty(clientId2)) {
-                            if (clientId === "s2") {
-                                (err[clientId][clientId2] === null).should.be.true()
-                            } else {
-                                (err[clientId][clientId2] === null).should.be.false()
+        const key = "foo"
+
+        ared3.exec("set", [key, "bar"], (err, result) => {
+            for (let clientId in err[key]) {
+                if (err[key].hasOwnProperty(clientId)) {
+                    for (let key2 in err[key][clientId]) {
+                        if (err[key][clientId].hasOwnProperty(key2)) {
+                            for (let clientId2 in err[key][clientId][key2]) {
+                                if (err[key][clientId][key2].hasOwnProperty(clientId2)) {
+                                    if (clientId === "s2") {
+                                        (err[key][clientId][key2][clientId2] === null).should.be.true()
+                                    } else {
+                                        (err[key][clientId][key2][clientId2] === null).should.be.false()
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
 
-            for (let clientId in result) {
-                if (result.hasOwnProperty(clientId)) {
-                    for (let clientId2 in result[clientId]) {
-                        if (result[clientId].hasOwnProperty(clientId2)) {
-                            result[clientId][clientId2].should.be.equal("OK")
+            for (let clientId in result[key]) {
+                if (result[key].hasOwnProperty(clientId)) {
+                    for (let key2 in result[key][clientId]) {
+                        if (result[key][clientId].hasOwnProperty(key2)) {
+                            for (let clientId2 in result[key][clientId][key2]) {
+                                if (result[key][clientId][key2].hasOwnProperty(clientId2)) {
+                                    result[key][clientId][key2][clientId2].should.be.equal("OK")
+                                }
+                            }
                         }
                     }
                 }
@@ -125,10 +135,12 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
     })
 
     it("Should get 'foo' with value 'bar' from the remaining server and redis", (done) => {
-        ared3.exec("set", ["foo", "bar"], () => {
-            ared3.exec("get", ["foo"], (err, result) => {
-                (err === null).should.be.true()
-                result.should.be.equal("bar")
+        const key = "foo"
+
+        ared3.exec("set", [key, "bar"], () => {
+            ared3.exec("get", [key], (err, result) => {
+                (err[key][key] === null).should.be.true()
+                result[key][key].should.be.equal("bar")
 
                 done()
             })

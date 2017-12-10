@@ -114,27 +114,47 @@ class ARed {
 
         let clients = Helper.getClients(this._clients, args[0], this.replication)
 
-        if (isRead) {
-            this._send(clients, 0, isRead, command, args, callback)
-        } else {
-            if (this.writePolicy === 0) {
-                for (let i = 0; i < clients.length; i++) {
-                    this._send(clients, i, isRead, command, args)
-                }
+        const errors = {}
+        const results = {}
+        let x = Object.keys(clients).length
+
+        for (let key in clients) {
+            args[0] = key // We change the key since we already know where to direct command.
+
+            if (isRead) {
+                this._send(clients[key], 0, isRead, command, args, (err, result) => {
+                    errors[key] = err
+                    results[key] = result
+
+                    if (--x === 0) {
+                        return callback(errors, results)
+                    }
+                })
             } else {
-                const errors = {}
-                const results = {}
-                let x = this.writePolicy
+                if (this.writePolicy === 0) {
+                    for (let i = 0; i < clients[key].length; i++) {
+                        this._send(clients[key], i, isRead, command, args)
+                    }
+                } else {
+                    const errors = {}
+                    const results = {}
+                    let y = this.writePolicy
 
-                for (let i = 0; i < clients.length; i++) {
-                    this._send(clients, i, isRead, command, args, (err, result) => {
-                        errors[clients[i][0]] = err
-                        results[clients[i][0]] = result
+                    errors[key] = {}
+                    results[key] = {}
 
-                        if (--x === 0) {
-                            return callback(errors, results)
-                        }
-                    })
+                    for (let i = 0; i < clients[key].length; i++) {
+                        this._send(clients[key], i, isRead, command, args, (err, result) => {
+                            errors[key][clients[key][i][0]] = err
+                            results[key][clients[key][i][0]] = result
+
+                            if (--y === 0) {
+                                if (--x === 0) {
+                                    return callback(errors, results)
+                                }
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -148,7 +168,7 @@ class ARed {
                 if (isRead) {
                     const nextClientId = clientId + 1
 
-                    if (err && nextClientId < this.replication) { // This needs checking if error a downed node
+                    if (err && nextClientId < this.replication) {
                         this._send(clients, nextClientId, isRead, command, args, callback)
                     } else {
                         return callback(err, result)
@@ -186,7 +206,7 @@ class ARed {
                     if (isRead) {
                         const nextClientId = clientId + 1
 
-                        if (result[0] && nextClientId < this.replication) { // This needs checking if error downed node
+                        if (result[0] && nextClientId < this.replication) {
                             this._send(clients, nextClientId, isRead, command, args, callback)
                         } else {
                             return callback(result[0], result[1])

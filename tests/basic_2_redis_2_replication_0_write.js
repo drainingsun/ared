@@ -39,7 +39,9 @@ describe("BASIC 2x REDIS 2x REPLICATION 0x WRITE", () => {
     })
 
     it("Should set 'foo' with value 'bar' to both servers and wait for none", (done) => {
-        ared.exec("set", ["foo", "bar"])
+        const key = "foo"
+
+        ared.exec("set", [key, "bar"])
 
         done()
     })

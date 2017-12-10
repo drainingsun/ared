@@ -40,7 +40,7 @@ describe("REBALANCER NODE ADD", () => {
         for (let i = 0; i < limit; i++) {
             const clients = Helper.getClients(redisClients, i, 1)
 
-            redisClients[clients[0][0]].set(i, i, (err) => {
+            redisClients[clients[i][0][0]].set(i, i, (err) => {
                 if (err) {
                     throw err
                 }

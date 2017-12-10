@@ -39,18 +39,20 @@ describe("BASIC 2x REDIS 2x REPLICATION", () => {
     })
 
     it("Should set 'foo' with value 'bar' to both servers, but wait for one only", (done) => {
-        ared.exec("set", ["foo", "bar"], (err, result) => {
+        const key = "foo"
+
+        ared.exec("set", [key, "bar"], (err, result) => {
             Object.keys(result).length.should.be.equal(1)
 
-            for (let clientId in err) {
-                if (err.hasOwnProperty(clientId)) {
-                    (err[clientId] === null).should.be.true()
+            for (let clientId in err[key]) {
+                if (err[key].hasOwnProperty(clientId)) {
+                    (err[key][clientId] === null).should.be.true()
                 }
             }
 
-            for (let clientId in result) {
-                if (result.hasOwnProperty(clientId)) {
-                    result[clientId].should.be.equal("OK")
+            for (let clientId in result[key]) {
+                if (result[key].hasOwnProperty(clientId)) {
+                    result[key][clientId].should.be.equal("OK")
                 }
             }
 

@@ -39,18 +39,20 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
     })
 
     it("Should set 'foo' with value 'bar' to both servers and wait for both", (done) => {
-        ared.exec("set", ["foo", "bar"], (err, result) => {
-            Object.keys(result).length.should.be.equal(2)
+        const key = "foo"
 
-            for (let clientId in err) {
-                if (err.hasOwnProperty(clientId)) {
-                    (err[clientId] === null).should.be.true()
+        ared.exec("set", [key, "bar"], (err, result) => {
+            Object.keys(result[key]).length.should.be.equal(2)
+
+            for (let clientId in err[key]) {
+                if (err[key].hasOwnProperty(clientId)) {
+                    (err[key][clientId] === null).should.be.true()
                 }
             }
 
-            for (let clientId in result) {
-                if (result.hasOwnProperty(clientId)) {
-                    result[clientId].should.be.equal("OK")
+            for (let clientId in result[key]) {
+                if (result[key].hasOwnProperty(clientId)) {
+                    result[key][clientId].should.be.equal("OK")
                 }
             }
 
@@ -59,10 +61,12 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
     })
 
     it("Should get 'foo' with value 'bar' from random server", (done) => {
-        ared.exec("set", ["foo", "bar"], () => {
-            ared.exec("get", ["foo"], (err, result) => {
-                (err === null).should.be.true()
-                result.should.be.equal("bar")
+        const key = "foo"
+
+        ared.exec("set", [key, "bar"], () => {
+            ared.exec("get", [key], (err, result) => {
+                (err[key] === null).should.be.true()
+                result[key].should.be.equal("bar")
 
                 done()
             })

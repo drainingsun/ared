@@ -31,14 +31,16 @@ describe("BASIC 1x REDIS", () => {
     })
 
     it("Should set 'foo' with value 'bar'", (done) => {
-        ared.exec("set", ["foo", "bar"], (err, result) => {
-            for (let clientId in err) {
+        const key = "foo"
+
+        ared.exec("set", [key, "bar"], (err, result) => {
+            for (let clientId in err[key]) {
                 if (err.hasOwnProperty(clientId)) {
                     (err[clientId] === null).should.be.true()
                 }
             }
 
-            for (let clientId in result) {
+            for (let clientId in result[key]) {
                 if (result.hasOwnProperty(clientId)) {
                     result[clientId].should.be.equal("OK")
                 }
@@ -49,10 +51,28 @@ describe("BASIC 1x REDIS", () => {
     })
 
     it("Should get 'foo' with value 'bar'", (done) => {
-        ared.exec("set", ["foo", "bar"], () => {
-            ared.exec("get", ["foo"], (err, result) => {
-                (err === null).should.be.true()
-                result.should.be.equal("bar")
+        const key = "foo"
+
+        ared.exec("set", [key, "bar"], () => {
+            ared.exec("get", [key], (err, result) => {
+                (err[key] === null).should.be.true()
+                result[key].should.be.equal("bar")
+
+                done()
+            })
+        })
+    })
+
+    it("Should set and get 'foo' and 'foo2' with value 'bar'", (done) => {
+        const key = "foo"
+        const key2 = "foo2"
+
+        ared.exec("set", [[key, key2], "bar"], () => {
+            ared.exec("get", [[key, key2]], (err, result) => {
+                (err[key] === null).should.be.true()
+                ;(err[key2] === null).should.be.true()
+                result[key].should.be.equal("bar")
+                result[key2].should.be.equal("bar")
 
                 done()
             })

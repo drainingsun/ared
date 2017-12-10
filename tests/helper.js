@@ -26,21 +26,25 @@ describe("HELPER", () => {
     }
 
     it("Should get the highest weight option for key 'foo'", (done) => {
-        const clients = Helper.getClients(redisOptions, "foo", 1)
+        const key = "foo"
 
-        clients[0][0].should.be.equal("r3")
-        clients[0][1].should.be.equal("15fa4405d23e2087")
+        const clients = Helper.getClients(redisOptions, key, 1)
+
+        clients[key][0][0].should.be.equal("r3")
+        clients[key][0][1].should.be.equal("15fa4405d23e2087")
 
         done()
     })
 
     it("Should get 2 highest weight and randomized options for key 'foo'", (done) => {
-        let first = Helper.getClients(redisOptions, "foo", 2)
+        const key = "foo"
+
+        let first = Helper.getClients(redisOptions, key, 2)
 
         const get = () => {
-            const clients = Helper.getClients(redisOptions, "foo", 2)
+            const clients = Helper.getClients(redisOptions, key, 2)
 
-            if (first[0][1] !== clients[0][1]) {
+            if (first[key][0][1] !== clients[key][0][1]) {
                 first = clients
 
                 done()

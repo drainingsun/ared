@@ -48,10 +48,12 @@ class Rebalancer {
             const keysToMove = []
 
             for (let i = 0; i < keys.length; i++) {
-                const clients = Helper.getClients(this._clients, keys[i], 1)
+                const key = keys[i]
 
-                if (clients[0][0] !== id) {
-                    keysToMove.push([clients[0][0], keys[i]])
+                const clients = Helper.getClients(this._clients, key, 1)
+
+                if (clients[key][0][0] !== id) {
+                    keysToMove.push([clients[key][0][0], key])
                 }
             }
 

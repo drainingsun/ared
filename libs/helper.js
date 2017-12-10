@@ -3,18 +3,36 @@
 const murmurhash = require("murmurhash-native")
 
 class Helper {
-    static getClients(clients, key, replication) {
-        let hashes = []
+    static getClients(clients, keys, replication) {
+        let selectedClients = {}
 
-        for (let id in clients) {
-            if (clients.hasOwnProperty(id)) {
-                hashes.push([id, murmurhash.murmurHash64(id + key)])
+        if (!Array.isArray(keys)) {
+            keys = [keys]
+        }
+
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]
+
+            if (typeof selectedClients[key] === "undefined") {
+                selectedClients[key] = []
+            }
+
+            for (let id in clients) {
+                if (clients.hasOwnProperty(id)) {
+                    selectedClients[key].push([id, murmurhash.murmurHash64(id + key)])
+                }
             }
         }
 
-        hashes = hashes.sort((a, b) => (a[1] > b[1]) - (a[1] < b[1])).slice(0, replication)
+        for (let key in selectedClients) {
+            if (selectedClients.hasOwnProperty(key)) {
+                selectedClients[key] = selectedClients[key].sort((a, b) => (a[1] > b[1]) - (a[1] < b[1]))
 
-        return Helper.shuffle(hashes)
+                selectedClients[key] = Helper.shuffle(selectedClients[key].slice(0, replication))
+            }
+        }
+
+        return selectedClients
     }
 
     static shuffle(range) {
