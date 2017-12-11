@@ -5,6 +5,8 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
+const Helper = require(`${__base}libs/helper`)
+
 const ared = new (require(`${__base}libs/index`))()
 
 describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
@@ -44,15 +46,15 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
         ared.exec("set", [key, "bar"], (err, result) => {
             Object.keys(result[key]).length.should.be.equal(2)
 
-            for (let clientId in err[key]) {
-                if (err[key].hasOwnProperty(clientId)) {
-                    (err[key][clientId] === null).should.be.true()
+            for (let path in Helper.flatten(err)) {
+                if (err.hasOwnProperty(path)) {
+                    (err[path] === null).should.be.true()
                 }
             }
 
-            for (let clientId in result[key]) {
-                if (result[key].hasOwnProperty(clientId)) {
-                    result[key][clientId].should.be.equal("OK")
+            for (let path in Helper.flatten(result)) {
+                if (result.hasOwnProperty(path)) {
+                    result[path].should.be.equal("OK")
                 }
             }
 
@@ -65,8 +67,17 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
 
         ared.exec("set", [key, "bar"], () => {
             ared.exec("get", [key], (err, result) => {
-                (err[key] === null).should.be.true()
-                result[key].should.be.equal("bar")
+                for (let path in Helper.flatten(err)) {
+                    if (err.hasOwnProperty(path)) {
+                        (err[path] === null).should.be.true()
+                    }
+                }
+
+                for (let path in Helper.flatten(result)) {
+                    if (result.hasOwnProperty(path)) {
+                        result[path].should.be.equal("bar")
+                    }
+                }
 
                 done()
             })

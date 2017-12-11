@@ -4,10 +4,13 @@ const http = require("http")
 
 const redis = require("redis")
 
+const Commands = require("./commands")
 const Helper = require("./helper")
 
-class ARed {
+class ARed extends Commands {
     constructor() {
+        super()
+
         this.replication = 1 // 1 - no replication, 2..n - replication factor
         this.writePolicy = 1 // 0 - don't wait at all, 1..n - wait for x replications
 
@@ -110,50 +113,52 @@ class ARed {
     }
 
     exec(command, args, callback) {
-        const isRead = this._readCommands[command] || false
+        if (typeof this[command] !== "undefined") {
+            this[command](args, callback)
+        } else {
+            const isRead = this._readCommands[command] || false
 
-        let clients = Helper.getClients(this._clients, args[0], this.replication)
+            const clients = Helper.getClients(this._clients, args[0], this.replication)
 
-        const errors = {}
-        const results = {}
-        let x = Object.keys(clients).length
+            const errors = {}
+            const results = {}
+            let x = Object.keys(clients).length
 
-        for (let key in clients) {
-            args[0] = key // We change the key since we already know where to direct command.
+            for (let key in clients) {
+                args[0] = key // We change the key since we already know where to direct command.
 
-            if (isRead) {
-                this._send(clients[key], 0, isRead, command, args, (err, result) => {
-                    errors[key] = err
-                    results[key] = result
+                if (isRead) {
+                    this._send(clients[key], 0, isRead, command, args, (err, result) => {
+                        errors[key] = err
+                        results[key] = result
 
-                    if (--x === 0) {
-                        return callback(errors, results)
-                    }
-                })
-            } else {
-                if (this.writePolicy === 0) {
-                    for (let i = 0; i < clients[key].length; i++) {
-                        this._send(clients[key], i, isRead, command, args)
-                    }
+                        if (--x === 0) {
+                            return callback(errors, results)
+                        }
+                    })
                 } else {
-                    const errors = {}
-                    const results = {}
-                    let y = this.writePolicy
+                    if (this.writePolicy === 0) {
+                        for (let i = 0; i < clients[key].length; i++) {
+                            this._send(clients[key], i, isRead, command, args)
+                        }
+                    } else {
+                        let y = this.writePolicy
 
-                    errors[key] = {}
-                    results[key] = {}
+                        errors[key] = {}
+                        results[key] = {}
 
-                    for (let i = 0; i < clients[key].length; i++) {
-                        this._send(clients[key], i, isRead, command, args, (err, result) => {
-                            errors[key][clients[key][i][0]] = err
-                            results[key][clients[key][i][0]] = result
+                        for (let i = 0; i < clients[key].length; i++) {
+                            this._send(clients[key], i, isRead, command, args, (err, result) => {
+                                errors[key][clients[key][i][0]] = err
+                                results[key][clients[key][i][0]] = result
 
-                            if (--y === 0) {
-                                if (--x === 0) {
-                                    return callback(errors, results)
+                                if (--y === 0) {
+                                    if (--x === 0) {
+                                        return callback(errors, results)
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             }
@@ -165,6 +170,10 @@ class ARed {
 
         if (client.constructor.name === "RedisClient") {
             client.send_command(command, args, (err, result) => {
+                if (err) {
+                    err = JSON.stringify(err)
+                }
+
                 if (isRead) {
                     const nextClientId = clientId + 1
 
@@ -218,6 +227,10 @@ class ARed {
             })
 
             req.on("error", (err) => {
+                if (err) {
+                    err = JSON.stringify(err)
+                }
+
                 if (isRead) {
                     const nextClientId = clientId + 1
 

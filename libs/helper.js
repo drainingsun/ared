@@ -51,6 +51,28 @@ class Helper {
 
         return range
     }
+
+    static flatten(obj) {
+        const toReturn = {}
+
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (typeof obj[key] === "object" && obj[key] !== null) {
+                    const flatObject = Helper.flatten(obj[key])
+
+                    for (let x in flatObject) {
+                        if (flatObject.hasOwnProperty(x)) {
+                            toReturn[key + "." + x] = flatObject[x]
+                        }
+                    }
+                } else {
+                    toReturn[key] = obj[key]
+                }
+            }
+        }
+
+        return toReturn
+    }
 }
 
 module.exports = Helper

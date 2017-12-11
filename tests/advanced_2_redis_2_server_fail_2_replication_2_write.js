@@ -13,6 +13,8 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
+const Helper = require(`${__base}libs/helper`)
+
 const ared = new (require(`${__base}libs/index`))()
 const ared2 = new (require(`${__base}libs/index`))()
 const ared3 = new (require(`${__base}libs/index`))()
@@ -98,34 +100,22 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
         const key = "foo"
 
         ared3.exec("set", [key, "bar"], (err, result) => {
-            for (let clientId in err[key]) {
-                if (err[key].hasOwnProperty(clientId)) {
-                    for (let key2 in err[key][clientId]) {
-                        if (err[key][clientId].hasOwnProperty(key2)) {
-                            for (let clientId2 in err[key][clientId][key2]) {
-                                if (err[key][clientId][key2].hasOwnProperty(clientId2)) {
-                                    if (clientId === "s2") {
-                                        (err[key][clientId][key2][clientId2] === null).should.be.true()
-                                    } else {
-                                        (err[key][clientId][key2][clientId2] === null).should.be.false()
-                                    }
-                                }
-                            }
-                        }
+            for (let path in Helper.flatten(err)) {
+                if (err.hasOwnProperty(path)) {
+                    if (-1 !== path.indexOf("s2")) {
+                        (err[path] === null).should.be.true()
+                    } else {
+                        (err[path] === null).should.be.false()
                     }
                 }
             }
 
-            for (let clientId in result[key]) {
-                if (result[key].hasOwnProperty(clientId)) {
-                    for (let key2 in result[key][clientId]) {
-                        if (result[key][clientId].hasOwnProperty(key2)) {
-                            for (let clientId2 in result[key][clientId][key2]) {
-                                if (result[key][clientId][key2].hasOwnProperty(clientId2)) {
-                                    result[key][clientId][key2][clientId2].should.be.equal("OK")
-                                }
-                            }
-                        }
+            for (let path in Helper.flatten(result)) {
+                if (result.hasOwnProperty(path)) {
+                    if (-1 !== path.indexOf("s1")) {
+                        (err[path] === null).should.be.true()
+                    } else {
+                        (err[path] === null).should.be.equal("OK")
                     }
                 }
             }
@@ -139,8 +129,17 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
 
         ared3.exec("set", [key, "bar"], () => {
             ared3.exec("get", [key], (err, result) => {
-                (err[key][key] === null).should.be.true()
-                result[key][key].should.be.equal("bar")
+                for (let path in Helper.flatten(err)) {
+                    if (err.hasOwnProperty(path)) {
+                        (err[path] === null).should.be.true()
+                    }
+                }
+
+                for (let path in Helper.flatten(result)) {
+                    if (result.hasOwnProperty(path)) {
+                        result[path].should.be.equal("bar")
+                    }
+                }
 
                 done()
             })

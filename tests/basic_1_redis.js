@@ -5,6 +5,8 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
+const Helper = require(`${__base}libs/helper`)
+
 const ared = new (require(`${__base}libs/index`))()
 
 describe("BASIC 1x REDIS", () => {
@@ -34,15 +36,15 @@ describe("BASIC 1x REDIS", () => {
         const key = "foo"
 
         ared.exec("set", [key, "bar"], (err, result) => {
-            for (let clientId in err[key]) {
-                if (err.hasOwnProperty(clientId)) {
-                    (err[clientId] === null).should.be.true()
+            for (let path in Helper.flatten(err)) {
+                if (err.hasOwnProperty(path)) {
+                    (err[path] === null).should.be.true()
                 }
             }
 
-            for (let clientId in result[key]) {
-                if (result.hasOwnProperty(clientId)) {
-                    result[clientId].should.be.equal("OK")
+            for (let path in Helper.flatten(result)) {
+                if (result.hasOwnProperty(path)) {
+                    result[path].should.be.equal("bar")
                 }
             }
 
@@ -55,8 +57,17 @@ describe("BASIC 1x REDIS", () => {
 
         ared.exec("set", [key, "bar"], () => {
             ared.exec("get", [key], (err, result) => {
-                (err[key] === null).should.be.true()
-                result[key].should.be.equal("bar")
+                for (let path in Helper.flatten(err)) {
+                    if (err.hasOwnProperty(path)) {
+                        (err[path] === null).should.be.true()
+                    }
+                }
+
+                for (let path in Helper.flatten(result)) {
+                    if (result.hasOwnProperty(path)) {
+                        result[path].should.be.equal("bar")
+                    }
+                }
 
                 done()
             })
@@ -69,10 +80,17 @@ describe("BASIC 1x REDIS", () => {
 
         ared.exec("set", [[key, key2], "bar"], () => {
             ared.exec("get", [[key, key2]], (err, result) => {
-                (err[key] === null).should.be.true()
-                ;(err[key2] === null).should.be.true()
-                result[key].should.be.equal("bar")
-                result[key2].should.be.equal("bar")
+                for (let path in Helper.flatten(err)) {
+                    if (err.hasOwnProperty(path)) {
+                        (err[path] === null).should.be.true()
+                    }
+                }
+
+                for (let path in Helper.flatten(result)) {
+                    if (result.hasOwnProperty(path)) {
+                        result[path].should.be.equal("bar")
+                    }
+                }
 
                 done()
             })
