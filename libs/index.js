@@ -206,7 +206,7 @@ class ARed {
                     if (isRead) {
                         const nextClientId = clientId + 1
 
-                        if (result[0] && nextClientId < this.replication) {
+                        if (result[0][args[0]] && nextClientId < this.replication) {
                             this._send(clients, nextClientId, isRead, command, args, callback)
                         } else {
                             return callback(result[0], result[1])
