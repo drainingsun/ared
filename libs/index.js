@@ -124,40 +124,49 @@ class ARed extends Commands {
             const results = {}
             let x = Object.keys(clients).length
 
+            /**
+             * @NOTICE Even though commands can be multi key, since we are operating in cluster environment we have
+             * to check every key for proper server and then only submit that key to that server. This might introduce
+             * big latencies on large quantity key commands.
+             *
+             * @TODO Implement multi key commands for the specific servers. Might help with the latencies on many keys.
+             */
             for (let key in clients) {
-                args[0] = key // We change the key since we already know where to direct command.
+                if (clients.hasOwnProperty(key)) {
+                    args[0] = key // We change the key since we already know where to direct the command.
 
-                if (isRead) {
-                    this._send(clients[key], 0, isRead, command, args, (err, result) => {
-                        errors[key] = err
-                        results[key] = result
+                    if (isRead) {
+                        this._send(clients[key], 0, isRead, command, args, (err, result) => {
+                            errors[key] = err
+                            results[key] = result
 
-                        if (--x === 0) {
-                            return callback(errors, results)
-                        }
-                    })
-                } else {
-                    if (this.writePolicy === 0) {
-                        for (let i = 0; i < clients[key].length; i++) {
-                            this._send(clients[key], i, isRead, command, args)
-                        }
+                            if (--x === 0) {
+                                return callback(errors, results)
+                            }
+                        })
                     } else {
-                        let y = this.writePolicy
+                        if (this.writePolicy === 0) {
+                            for (let i = 0; i < clients[key].length; i++) {
+                                this._send(clients[key], i, isRead, command, args)
+                            }
+                        } else {
+                            let y = this.writePolicy
 
-                        errors[key] = {}
-                        results[key] = {}
+                            errors[key] = {}
+                            results[key] = {}
 
-                        for (let i = 0; i < clients[key].length; i++) {
-                            this._send(clients[key], i, isRead, command, args, (err, result) => {
-                                errors[key][clients[key][i][0]] = err
-                                results[key][clients[key][i][0]] = result
+                            for (let i = 0; i < clients[key].length; i++) {
+                                this._send(clients[key], i, isRead, command, args, (err, result) => {
+                                    errors[key][clients[key][i][0]] = err
+                                    results[key][clients[key][i][0]] = result
 
-                                if (--y === 0) {
-                                    if (--x === 0) {
-                                        return callback(errors, results)
+                                    if (--y === 0) {
+                                        if (--x === 0) {
+                                            return callback(errors, results)
+                                        }
                                     }
-                                }
-                            })
+                                })
+                            }
                         }
                     }
                 }
@@ -234,7 +243,7 @@ class ARed extends Commands {
                 if (isRead) {
                     const nextClientId = clientId + 1
 
-                    if (err && nextClientId < this.replication) { // This needs checking if error a downed node
+                    if (err && nextClientId < this.replication) {
                         this._send(clients, nextClientId, isRead, command, args, callback)
                     } else {
                         return callback(err, null)

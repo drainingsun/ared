@@ -55,4 +55,22 @@ describe("HELPER", () => {
 
         get()
     })
+
+    it("Should flatten a deep object to one dimensional key => value object", (done) => {
+        const object = {
+            a: {b: null},
+            c: {
+                d: "foo",
+                e: {f: "bar"}
+            }
+        }
+
+        const flatObject = Helper.flatten(object)
+
+        ;(flatObject["a.b"] === null).should.be.true()
+        flatObject["c.d"].should.be.equal("foo")
+        flatObject["c.e.f"].should.be.equal("bar")
+
+        done()
+    })
 })
