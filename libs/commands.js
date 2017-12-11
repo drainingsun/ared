@@ -62,7 +62,7 @@ class Commands {
                                     }
 
                                     this._send(baseKeyClients, 0, true, "pfcount", [resultKeys], (err, result) => {
-                                        this._send(baseKeyClients, 0, true, "del", [resultKeys], () => {
+                                        this._send(baseKeyClients, 0, false, "del", [resultKeys], () => {
                                             return callback(err, result)
                                         })
                                     })
