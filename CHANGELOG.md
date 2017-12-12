@@ -1,3 +1,7 @@
+# 2017-12-12, v0.0.7
+* Fixed issue when all values are `null` in multi key commands 
+* Added test case for all `null` values in multi keys commands
+
 # 2017-12-12, v0.0.6
 * Fixed issue with `null` values in multi key commands 
 * Added test case for `null` values in multi keys commands

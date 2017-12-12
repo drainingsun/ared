@@ -30,16 +30,20 @@ class Commands {
                 aggregatedErrors["restore"] = errors
 
                 // Do the required command
-                this._send(baseClients, 0, true, "pfcount", [keys], (error, result) => {
-                    aggregatedErrors["pfcount"] = error
+                if (keys.length > 0) {
+                    this._send(baseClients, 0, true, "pfcount", [keys], (error, result) => {
+                        aggregatedErrors["pfcount"] = error
 
-                    // Remove the gathered data
-                    this._delete(keys, baseClients, (errors) => {
-                        aggregatedErrors["del"] = errors
+                        // Remove the gathered data
+                        this._delete(keys, baseClients, (errors) => {
+                            aggregatedErrors["del"] = errors
 
-                        return callback(aggregatedErrors, result)
+                            return callback(aggregatedErrors, result)
+                        })
                     })
-                })
+                } else {
+                    return callback(aggregatedErrors, null)
+                }
             })
         })
     }

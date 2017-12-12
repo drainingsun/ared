@@ -82,6 +82,23 @@ describe("BASIC 2x REDIS", () => {
         })
     })
 
+
+    it("Should respond when all keys are null on multi key command", (done) => {
+        const key = "bar"
+
+        ared.exec("pfcount", [[key]], (error, result) => {
+            for (let path in Helper.flatten(error)) {
+                if (error.hasOwnProperty(path)) {
+                    (error[path] === null).should.be.true()
+                }
+            }
+
+            (result === null).should.be.true()
+
+            done()
+        })
+    })
+
     it("Should ignore non existent keys on multi key command", (done) => {
         const key = "bar"
         const key2 = "qux"
