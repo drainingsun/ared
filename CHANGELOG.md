@@ -1,3 +1,7 @@
+# 2017-12-12, v0.0.5
+* Exposed `Helper` class for external access
+* Renamed internal method `Helper.shuffle` to follow style guidelines
+
 # 2017-12-12, v0.0.4
 * Added extra keyword for package.json
 * Bumped version in package.json

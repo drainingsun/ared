@@ -14,10 +14,10 @@ class Helper {
 
         selectedClients = selectedClients.sort((a, b) => (a[1] > b[1]) - (a[1] < b[1]))
 
-        return Helper.shuffle(selectedClients.slice(0, replication))
+        return Helper._shuffle(selectedClients.slice(0, replication))
     }
 
-    static shuffle(range) {
+    static _shuffle(range) {
         let counter = range.length
 
         while (counter > 0) {

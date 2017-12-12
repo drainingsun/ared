@@ -5,6 +5,8 @@ const Helper = require("./helper")
 class Commands {
     constructor() {
         this.prefix = "ared"
+
+        this.Helper = Helper
     }
 
     pfcount(args, callback) {
