@@ -30,8 +30,8 @@ describe("HELPER", () => {
 
         const clients = Helper.getClients(redisOptions, key, 1)
 
-        clients[key][0][0].should.be.equal("r3")
-        clients[key][0][1].should.be.equal("15fa4405d23e2087")
+        clients[0][0].should.be.equal("r3")
+        clients[0][1].should.be.equal("15fa4405d23e2087")
 
         done()
     })
@@ -44,7 +44,7 @@ describe("HELPER", () => {
         const get = () => {
             const clients = Helper.getClients(redisOptions, key, 2)
 
-            if (first[key][0][1] !== clients[key][0][1]) {
+            if (first[0][1] !== clients[0][1]) {
                 first = clients
 
                 done()

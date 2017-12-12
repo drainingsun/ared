@@ -14,6 +14,7 @@ describe("BASIC 1x REDIS", () => {
         r1: {
             host: "127.0.0.1",
             port: 6379,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         }
     }
@@ -35,10 +36,10 @@ describe("BASIC 1x REDIS", () => {
     it("Should set 'foo' with value 'bar'", (done) => {
         const key = "foo"
 
-        ared.exec("set", [key, "bar"], (err, result) => {
-            for (let path in Helper.flatten(err)) {
-                if (err.hasOwnProperty(path)) {
-                    (err[path] === null).should.be.true()
+        ared.exec("set", [key, "bar"], (error, result) => {
+            for (let path in Helper.flatten(error)) {
+                if (error.hasOwnProperty(path)) {
+                    (error[path] === null).should.be.true()
                 }
             }
 
@@ -56,33 +57,10 @@ describe("BASIC 1x REDIS", () => {
         const key = "foo"
 
         ared.exec("set", [key, "bar"], () => {
-            ared.exec("get", [key], (err, result) => {
-                for (let path in Helper.flatten(err)) {
-                    if (err.hasOwnProperty(path)) {
-                        (err[path] === null).should.be.true()
-                    }
-                }
-
-                for (let path in Helper.flatten(result)) {
-                    if (result.hasOwnProperty(path)) {
-                        result[path].should.be.equal("bar")
-                    }
-                }
-
-                done()
-            })
-        })
-    })
-
-    it("Should set and get 'foo' and 'foo2' with value 'bar'", (done) => {
-        const key = "foo"
-        const key2 = "foo2"
-
-        ared.exec("set", [[key, key2], "bar"], () => {
-            ared.exec("get", [[key, key2]], (err, result) => {
-                for (let path in Helper.flatten(err)) {
-                    if (err.hasOwnProperty(path)) {
-                        (err[path] === null).should.be.true()
+            ared.exec("get", [key], (error, result) => {
+                for (let path in Helper.flatten(error)) {
+                    if (error.hasOwnProperty(path)) {
+                        (error[path] === null).should.be.true()
                     }
                 }
 

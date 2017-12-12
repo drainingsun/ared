@@ -52,8 +52,8 @@ class Rebalancer {
 
                 const clients = Helper.getClients(this._clients, key, 1)
 
-                if (clients[key][0][0] !== id) {
-                    keysToMove.push([clients[key][0][0], key])
+                if (clients[0][0] !== id) {
+                    keysToMove.push([clients[0][0], key])
                 }
             }
 

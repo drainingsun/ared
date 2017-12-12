@@ -34,11 +34,13 @@ describe("ADVANCED 2x REDIS 2x SERVER 2x REPLICATION 2x WRITE", () => {
         r1: {
             host: "127.0.0.1",
             port: 6379,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         },
         r2: {
             host: "127.0.0.1",
             port: 6380,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         }
     }
@@ -47,11 +49,13 @@ describe("ADVANCED 2x REDIS 2x SERVER 2x REPLICATION 2x WRITE", () => {
         r3: {
             host: "127.0.0.1",
             port: 6381,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         },
         r4: {
             host: "127.0.0.1",
             port: 6382,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         }
     }
@@ -97,10 +101,10 @@ describe("ADVANCED 2x REDIS 2x SERVER 2x REPLICATION 2x WRITE", () => {
     it("Should set 'foo' with value 'bar'", (done) => {
         const key = "foo"
 
-        ared3.exec("set", [key, "bar"], (err, result) => {
-            for (let path in Helper.flatten(err)) {
-                if (err.hasOwnProperty(path)) {
-                    (err[path] === null).should.be.true()
+        ared3.exec("set", [key, "bar"], (error, result) => {
+            for (let path in Helper.flatten(error)) {
+                if (error.hasOwnProperty(path)) {
+                    (error[path] === null).should.be.true()
                 }
             }
 
@@ -118,10 +122,10 @@ describe("ADVANCED 2x REDIS 2x SERVER 2x REPLICATION 2x WRITE", () => {
         const key = "foo"
 
         ared3.exec("set", [key, "bar"], () => {
-            ared3.exec("get", [key], (err, result) => {
-                for (let path in Helper.flatten(err)) {
-                    if (err.hasOwnProperty(path)) {
-                        (err[path] === null).should.be.true()
+            ared3.exec("get", [key], (error, result) => {
+                for (let path in Helper.flatten(error)) {
+                    if (error.hasOwnProperty(path)) {
+                        (error[path] === null).should.be.true()
                     }
                 }
 

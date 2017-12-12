@@ -14,11 +14,13 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
         r1: {
             host: "127.0.0.1",
             port: 6379,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         },
         r2: {
             host: "127.0.0.1",
             port: 6380,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         }
     }
@@ -43,12 +45,12 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
     it("Should set 'foo' with value 'bar' to both servers and wait for both", (done) => {
         const key = "foo"
 
-        ared.exec("set", [key, "bar"], (err, result) => {
+        ared.exec("set", [key, "bar"], (error, result) => {
             Object.keys(result[key]).length.should.be.equal(2)
 
-            for (let path in Helper.flatten(err)) {
-                if (err.hasOwnProperty(path)) {
-                    (err[path] === null).should.be.true()
+            for (let path in Helper.flatten(error)) {
+                if (error.hasOwnProperty(path)) {
+                    (error[path] === null).should.be.true()
                 }
             }
 
@@ -66,10 +68,10 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
         const key = "foo"
 
         ared.exec("set", [key, "bar"], () => {
-            ared.exec("get", [key], (err, result) => {
-                for (let path in Helper.flatten(err)) {
-                    if (err.hasOwnProperty(path)) {
-                        (err[path] === null).should.be.true()
+            ared.exec("get", [key], (error, result) => {
+                for (let path in Helper.flatten(error)) {
+                    if (error.hasOwnProperty(path)) {
+                        (error[path] === null).should.be.true()
                     }
                 }
 

@@ -14,11 +14,13 @@ describe("BASIC 2x REDIS", () => {
         r1: {
             host: "127.0.0.1",
             port: 6379,
-            enable_offline_queue: false // eslint-disable-line camelcase
+            detect_buffers: true, // eslint-disable-line camelcase,
+            enable_offline_queue: false // eslint-disable-line camelcase,
         },
         r2: {
             host: "127.0.0.1",
             port: 6380,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         }
     }
@@ -40,10 +42,10 @@ describe("BASIC 2x REDIS", () => {
     it("Should set 'foo' with value 'bar' to second server", (done) => {
         const key = "foo"
 
-        ared.exec("set", [key, "bar"], (err, result) => {
-            for (let path in Helper.flatten(err)) {
-                if (err.hasOwnProperty(path)) {
-                    (err[path] === null).should.be.true()
+        ared.exec("set", [key, "bar"], (error, result) => {
+            for (let path in Helper.flatten(error)) {
+                if (error.hasOwnProperty(path)) {
+                    (error[path] === null).should.be.true()
                 }
             }
 
@@ -62,10 +64,10 @@ describe("BASIC 2x REDIS", () => {
         const key = "foo"
 
         ared.exec("set", [key, "bar"], () => {
-            ared.exec("get", [key], (err, result) => {
-                for (let path in Helper.flatten(err)) {
-                    if (err.hasOwnProperty(path)) {
-                        (err[path] === null).should.be.true()
+            ared.exec("get", [key], (error, result) => {
+                for (let path in Helper.flatten(error)) {
+                    if (error.hasOwnProperty(path)) {
+                        (error[path] === null).should.be.true()
                     }
                 }
 
@@ -76,6 +78,27 @@ describe("BASIC 2x REDIS", () => {
                 }
 
                 done()
+            })
+        })
+    })
+
+    it("Should gather keys from both servers, put to one, do the command, and delete afterwards", (done) => {
+        const key = "bar"
+        const key2 = "qux"
+
+        ared.exec("pfadd", [key, "foo"], () => {
+            ared.exec("pfadd", [key2, "bar"], () => {
+                ared.exec("pfcount", [[key, key2]], (error, result) => {
+                    for (let path in Helper.flatten(error)) {
+                        if (error.hasOwnProperty(path)) {
+                            (error[path] === null).should.be.true()
+                        }
+                    }
+
+                    result.should.be.equal(2)
+
+                    done()
+                })
             })
         })
     })

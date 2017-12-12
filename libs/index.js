@@ -5,7 +5,6 @@ const http = require("http")
 const redis = require("redis")
 
 const Commands = require("./commands")
-const Helper = require("./helper")
 
 class ARed extends Commands {
     constructor() {
@@ -16,10 +15,10 @@ class ARed extends Commands {
 
         this._readCommands = {
             get: true,
-            mget: true,
             hgetall: true,
             pfcount: true,
-            smembers: true
+            smembers: true,
+            dump: true
         }
 
         this._agent = new http.Agent({keepAlive: true})
@@ -60,8 +59,8 @@ class ARed extends Commands {
                 if (redisOptions.hasOwnProperty(id)) {
                     const client = redis.createClient(redisOptions[id])
 
-                    client.on("error", (err) => {
-                        this.redisErrors[id] = err
+                    client.on("error", (error) => {
+                        this.redisErrors[id] = error
                     })
 
                     client.on("ready", () => {
@@ -92,14 +91,14 @@ class ARed extends Commands {
                 req.on("end", () => {
                     const result = JSON.parse(body)
 
-                    this.exec(result[0], result[1], (err, result) => {
-                        res.end(JSON.stringify([err, result]))
+                    this.exec(result[0], result[1], (error, result) => {
+                        res.end(JSON.stringify([error, result]))
                     })
                 })
             })
 
-            this._server.on("error", (err) => {
-                throw err
+            this._server.on("error", (error) => {
+                throw error
             })
 
             this._server.listen(serverOptions, () => {
@@ -116,61 +115,13 @@ class ARed extends Commands {
         if (typeof this[command] !== "undefined") {
             this[command](args, callback)
         } else {
-            const isRead = this._readCommands[command] || false
-
-            const clients = Helper.getClients(this._clients, args[0], this.replication)
-
-            const errors = {}
-            const results = {}
-            let x = Object.keys(clients).length
-
-            /**
-             * @NOTICE Even though commands can be multi key, since we are operating in cluster environment we have
-             * to check every key for proper server and then only submit that key to that server. This might introduce
-             * big latencies on large quantity key commands.
-             *
-             * @TODO Implement multi key commands for the specific servers. Might help with the latencies on many keys.
-             */
-            for (let key in clients) {
-                if (clients.hasOwnProperty(key)) {
-                    args[0] = key // We change the key since we already know where to direct the command.
-
-                    if (isRead) {
-                        this._send(clients[key], 0, isRead, command, args, (err, result) => {
-                            errors[key] = err
-                            results[key] = result
-
-                            if (--x === 0) {
-                                return callback(errors, results)
-                            }
-                        })
-                    } else {
-                        if (this.writePolicy === 0) {
-                            for (let i = 0; i < clients[key].length; i++) {
-                                this._send(clients[key], i, isRead, command, args)
-                            }
-                        } else {
-                            let y = this.writePolicy
-
-                            errors[key] = {}
-                            results[key] = {}
-
-                            for (let i = 0; i < clients[key].length; i++) {
-                                this._send(clients[key], i, isRead, command, args, (err, result) => {
-                                    errors[key][clients[key][i][0]] = err
-                                    results[key][clients[key][i][0]] = result
-
-                                    if (--y === 0) {
-                                        if (--x === 0) {
-                                            return callback(errors, results)
-                                        }
-                                    }
-                                })
-                            }
-                        }
-                    }
-                }
+            if (Array.isArray(args[0])) {
+                throw new Error(`Command ${command} is currently not supported with multi keys.`)
             }
+
+            this._scatter(command, args, this.writePolicy, (errors, results) => {
+                return callback(errors, results)
+            })
         }
     }
 
@@ -178,21 +129,21 @@ class ARed extends Commands {
         const client = this._clients[clients[clientId][0]]
 
         if (client.constructor.name === "RedisClient") {
-            client.send_command(command, args, (err, result) => {
-                if (err) {
-                    err = JSON.stringify(err)
+            client.send_command(command, args, (error, result) => {
+                if (error) {
+                    error = JSON.stringify(error)
                 }
 
                 if (isRead) {
                     const nextClientId = clientId + 1
 
-                    if (err && nextClientId < this.replication) {
+                    if (error && nextClientId < this.replication) {
                         this._send(clients, nextClientId, isRead, command, args, callback)
                     } else {
-                        return callback(err, result)
+                        return callback(error, result)
                     }
                 } else if (callback) {
-                    return callback(err, result)
+                    return callback(error, result)
                 }
             })
         } else {
@@ -235,21 +186,21 @@ class ARed extends Commands {
                 })
             })
 
-            req.on("error", (err) => {
-                if (err) {
-                    err = JSON.stringify(err)
+            req.on("error", (error) => {
+                if (error) {
+                    error = JSON.stringify(error)
                 }
 
                 if (isRead) {
                     const nextClientId = clientId + 1
 
-                    if (err && nextClientId < this.replication) {
+                    if (error && nextClientId < this.replication) {
                         this._send(clients, nextClientId, isRead, command, args, callback)
                     } else {
-                        return callback(err, null)
+                        return callback(error, null)
                     }
                 } else if (callback) {
-                    return callback(err, null)
+                    return callback(error, null)
                 }
             })
 

@@ -40,9 +40,9 @@ describe("REBALANCER NODE ADD", () => {
         for (let i = 0; i < limit; i++) {
             const clients = Helper.getClients(redisClients, i, 1)
 
-            redisClients[clients[i][0][0]].set(i, i, (err) => {
-                if (err) {
-                    throw err
+            redisClients[clients[0][0]].set(i, i, (error) => {
+                if (error) {
+                    throw error
                 }
 
                 if (--async === 0) {
@@ -65,9 +65,9 @@ describe("REBALANCER NODE ADD", () => {
     it("Do rebalance", (done) => {
         rebalancer.start(() => {
             for (let client in redisClients) {
-                redisClients[client].send_command("DBSIZE", (err, result) => {
-                    if (err) {
-                        throw err
+                redisClients[client].send_command("DBSIZE", (error, result) => {
+                    if (error) {
+                        throw error
                     }
 
                     switch (client) {

@@ -5,8 +5,6 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
-const Helper = require(`${__base}libs/helper`)
-
 const ared = new (require(`${__base}libs/index`))()
 
 describe("BASIC 2x REDIS 2x REPLICATION 0x WRITE", () => {
@@ -14,11 +12,13 @@ describe("BASIC 2x REDIS 2x REPLICATION 0x WRITE", () => {
         r1: {
             host: "127.0.0.1",
             port: 6379,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         },
         r2: {
             host: "127.0.0.1",
             port: 6380,
+            detect_buffers: true, // eslint-disable-line camelcase,
             enable_offline_queue: false // eslint-disable-line camelcase
         }
     }
