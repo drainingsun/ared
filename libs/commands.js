@@ -103,26 +103,32 @@ class Commands {
         let x = Object.keys(keys).length
 
         for (let key in keys) {
-            const tmpKey = `${baseKey}_${key}`
+            if (keys[key]) {
+                const tmpKey = `${baseKey}_${key}`
 
-            resultKeys.push(tmpKey)
+                resultKeys.push(tmpKey)
 
-            let y = clients.length
+                let y = clients.length
 
-            errors[tmpKey] = {}
-            results[tmpKey] = {}
+                errors[tmpKey] = {}
+                results[tmpKey] = {}
 
-            for (let i = 0; i < clients.length; i++) {
-                this._send(clients, i, false, "restore", [tmpKey, 0, keys[key]], (error, result) => {
-                    errors[tmpKey][clients[i][0]] = error
-                    results[tmpKey][clients[i][0]] = result
+                for (let i = 0; i < clients.length; i++) {
+                    this._send(clients, i, false, "restore", [tmpKey, 0, keys[key]], (error, result) => {
+                        errors[tmpKey][clients[i][0]] = error
+                        results[tmpKey][clients[i][0]] = result
 
-                    if (--y === 0) {
-                        if (--x === 0) {
-                            return callback(errors, results, resultKeys)
+                        if (--y === 0) {
+                            if (--x === 0) {
+                                return callback(errors, results, resultKeys)
+                            }
                         }
-                    }
-                })
+                    })
+                }
+            } else {
+                if (--x === 0) {
+                    return callback(errors, results, resultKeys)
+                }
             }
         }
     }

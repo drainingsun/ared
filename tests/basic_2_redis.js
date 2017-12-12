@@ -82,6 +82,25 @@ describe("BASIC 2x REDIS", () => {
         })
     })
 
+    it("Should ignore non existent keys on multi key command", (done) => {
+        const key = "bar"
+        const key2 = "qux"
+
+        ared.exec("pfadd", [key, "foo"], () => {
+            ared.exec("pfcount", [[key, key2]], (error, result) => {
+                for (let path in Helper.flatten(error)) {
+                    if (error.hasOwnProperty(path)) {
+                        (error[path] === null).should.be.true()
+                    }
+                }
+
+                result.should.be.equal(1)
+
+                done()
+            })
+        })
+    })
+
     it("Should gather keys from both servers, put to one, do the command, and delete afterwards", (done) => {
         const key = "bar"
         const key2 = "qux"

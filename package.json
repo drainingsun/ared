@@ -4,7 +4,7 @@
     "keywords": ["redis", "cluster", "proxy", "scaling", "Rendezvous Hashing", "HRW"],
     "author": "Draining Sun",
     "license": "MIT",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "main": "libs",
 
     "engines": {
