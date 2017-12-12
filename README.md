@@ -7,7 +7,7 @@ A kind of a different approach in clustering Redis nodes. More info: https://en.
 
 2 Redis instances. Data is distributed randomly 50/50. If replication is enabled, reads are also split 50/50.
 ```javascript
-const ared = new (require("ared"))()
+const ared = new (require("ARed"))()
 
 // ared.replication = 2 // Uncomment this for 2x replication
 // ared.writePolicy = 2 // Uncomment this to wait for both writes to finish. (1 - one write, 0 - no wait)
@@ -15,11 +15,13 @@ const ared = new (require("ared"))()
 const redisOptions = {
     r1: {
         host: "127.0.0.1",
-        port: 6379
+        port: 6379,
+        detect_buffers: true // Required if you are going to use multi key commands
     },
     r2: {
         host: "127.0.0.1",
-        port: 6380
+        port: 6380,
+        detect_buffers: true // Required if you are going to use multi key commands
     }
 }
 

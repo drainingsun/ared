@@ -1,3 +1,13 @@
+# 2017-12-12, v0.0.4
+* Added extra keyword for package.json
+* Bumped version in package.json
+* Updated example in README.md
+* Revamped error logging system to have more details
+* Added support for multi key commands (only PFCOUNT for now)
+* Temporary removed `mget` from read commands
+* Added `dump` support for proper ARead random reads
+* Updated tests
+
 # 2017-11-19, v0.0.3
 * Added example to README.md
 * Made sure library does not depend on globals
