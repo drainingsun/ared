@@ -1,3 +1,6 @@
+# 2017-12-14, v0.1.4
+* Bumped version to correct number
+
 # 2017-12-14, v0.1.3
 * Fixed CHANGELOG.md
 
