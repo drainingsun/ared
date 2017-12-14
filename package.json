@@ -1,10 +1,10 @@
 {
     "name": "ARed",
-    "description": "Redis Cluster based on Rendezvous Hashing (HRW)",
+    "description": "Redis clustering based on Rendezvous Hashing (HRW)",
     "keywords": ["redis", "cluster", "proxy", "scaling", "Rendezvous Hashing", "HRW"],
     "author": "Draining Sun",
     "license": "MIT",
-    "version": "0.0.7",
+    "version": "0.1.0",
     "main": "libs",
 
     "engines": {

@@ -6,6 +6,51 @@ class Commands {
     constructor() {
         this.prefix = "ared"
 
+        this._readCommands = {
+            bitcount: true,
+            bitpos: true,
+            get: true,
+            getbit: true,
+            getrange: true,
+            strlen: true,
+            zcard: true,
+            zcount: true,
+            zlexcount: true,
+            zrange: true,
+            zrangebylex: true,
+            zrevrangebylex: true,
+            zrangebyscore: true,
+            zrank: true,
+            zrevrange: true,
+            zrevrangebyscore: true,
+            zrevrank: true,
+            zscore: true,
+            zscan: true,
+            scard: true,
+            smembers: true,
+            srandmember: true,
+            lindex: true,
+            llen: true,
+            lrange: true,
+            dump: true,
+            exists: true,
+            keys: true,
+            pfcount: true,
+            hexists: true,
+            hget: true,
+            hgetall: true,
+            hkeys: true,
+            hlen: true,
+            hstrlen: true,
+            hvals: true,
+            hscan: true,
+            geohash: true,
+            geopos: true,
+            geodist: true,
+            georadius: true,
+            georadiusbymember: true
+        }
+
         this.Helper = Helper
     }
 

@@ -13,14 +13,6 @@ class ARed extends Commands {
         this.replication = 1 // 1 - no replication, 2..n - replication factor
         this.writePolicy = 1 // 0 - don't wait at all, 1..n - wait for x replications
 
-        this._readCommands = {
-            get: true,
-            hgetall: true,
-            pfcount: true,
-            smembers: true,
-            dump: true
-        }
-
         this._agent = new http.Agent({keepAlive: true})
 
         this._server = null
@@ -112,6 +104,8 @@ class ARed extends Commands {
     }
 
     exec(command, args, callback) {
+        command = command.toLowerCase()
+
         if (typeof this[command] !== "undefined") {
             this[command](args, callback)
         } else {

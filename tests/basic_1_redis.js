@@ -74,4 +74,22 @@ describe("BASIC 1x REDIS", () => {
             })
         })
     })
+
+    it("Should accept all cap read commands", (done) => {
+        const key = "foo"
+
+        ared.exec("set", [key, "bar"], () => {
+            ared.exec("GET", [key], (error, result) => {
+                for (let path in Helper.flatten(error)) {
+                    if (error.hasOwnProperty(path)) {
+                        (error[path] === null).should.be.true()
+                    }
+                }
+
+                result[key].should.be.equal("bar")
+
+                done()
+            })
+        })
+    })
 })
