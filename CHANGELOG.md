@@ -1,3 +1,6 @@
+# 2017-12-14, v0.1.1
+* Added git repo link in package.json
+
 # 2017-12-14, v0.1.0
 * Renamed package ARed to ared
 * Updated README.md

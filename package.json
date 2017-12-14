@@ -4,7 +4,7 @@
     "keywords": ["redis", "cluster", "proxy", "scaling", "Rendezvous Hashing", "HRW"],
     "author": "Draining Sun",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "main": "libs",
 
     "engines": {
@@ -26,5 +26,10 @@
     "scripts": {
         "lint": "eslint ./ || true",
         "test": "mocha  --timeout 5000 --exit tests"
+    },
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/drainingsun/ared.git"
     }
 }
