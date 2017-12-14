@@ -1,5 +1,8 @@
+# 2017-12-14, v0.1.3
+* Fixed CHANGELOG.md
+
 # 2017-12-14, v0.1.2
-Fixed the npm package name
+* Fixed the npm package name
 
 # 2017-12-14, v0.1.1
 * Added git repo link in package.json
