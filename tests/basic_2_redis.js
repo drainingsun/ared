@@ -138,4 +138,27 @@ describe("BASIC 2x REDIS", () => {
             })
         })
     })
+
+    it("Should gather keys from both servers", (done) => {
+        const key = "bar"
+        const key2 = "qux"
+
+        ared.exec("set", [key, "foo"], () => {
+            ared.exec("set", [key2, "bar"], () => {
+                ared.exec("mget", [[key, key2]], (error, result) => {
+                    for (let path in Helper.flatten(error)) {
+                        if (error.hasOwnProperty(path)) {
+                            (error[path] === null).should.be.true()
+                        }
+                    }
+
+                    Object.keys(result).length.should.be.equal(2)
+                    result[key].should.be.equal("foo")
+                    result[key2].should.be.equal("bar")
+
+                    done()
+                })
+            })
+        })
+    })
 })

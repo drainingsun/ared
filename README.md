@@ -48,7 +48,7 @@ See tests for more examples.
 
 ## Supported commands
 All single key commands should work. Multi key commands (remember, keys can be on different servers) require custom 
-logic which is yet to be implemented, with the exception of PFCOUNT, which is supported. 
+logic which is yet to be implemented, with the exception of MGET and PFCOUNT, which are supported. 
 
 
 ## Testing

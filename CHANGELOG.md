@@ -1,3 +1,6 @@
+# 2017-12-15, v0.1.5
+* Added naive `mget` command implementation and tests
+
 # 2017-12-14, v0.1.4
 * Bumped version to correct number
 

@@ -10,6 +10,7 @@ class Commands {
             bitcount: true,
             bitpos: true,
             get: true,
+            mget: true,
             getbit: true,
             getrange: true,
             strlen: true,
@@ -90,6 +91,12 @@ class Commands {
                     return callback(aggregatedErrors, null)
                 }
             })
+        })
+    }
+
+    mget(args, callback) {
+        this._scatter("get", args, this.writePolicy, (errors, results) => {
+            return callback(errors, results)
         })
     }
 
