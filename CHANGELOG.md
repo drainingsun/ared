@@ -1,3 +1,6 @@
+# 2017-12-15, v0.1.6
+* Made sure `Helper.flatten` doesn't ignore empty arrays
+
 # 2017-12-15, v0.1.5
 * Added naive `mget` command implementation and tests
 

@@ -62,7 +62,8 @@ describe("HELPER", () => {
             c: {
                 d: "foo",
                 e: {f: "bar"}
-            }
+            },
+            g: []
         }
 
         const flatObject = Helper.flatten(object)
@@ -70,6 +71,7 @@ describe("HELPER", () => {
         ;(flatObject["a.b"] === null).should.be.true()
         flatObject["c.d"].should.be.equal("foo")
         flatObject["c.e.f"].should.be.equal("bar")
+        flatObject["g"].length.should.be.equal(0)
 
         done()
     })
