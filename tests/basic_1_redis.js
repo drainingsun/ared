@@ -35,11 +35,7 @@ describe("BASIC 1x REDIS", () => {
         const key = "foo"
 
         ared.exec("set", [key, "bar"], (error, result) => {
-            for (let path in error) {
-                if (error.hasOwnProperty(path)) {
-                    (error[path] === null).should.be.true()
-                }
-            }
+            (error === null).should.be.true()
 
             result[key].should.be.equal("OK")
 

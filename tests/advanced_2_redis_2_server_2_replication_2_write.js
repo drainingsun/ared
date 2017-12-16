@@ -102,11 +102,7 @@ describe("ADVANCED 2x REDIS 2x SERVER 2x REPLICATION 2x WRITE", () => {
         ared3.exec("set", [key, "bar"], (error, result) => {
             (error === null).should.be.true()
 
-            for (let path in result) {
-                if (result.hasOwnProperty(path)) {
-                    result[path].should.be.equal("OK")
-                }
-            }
+            result[key].should.be.equal("OK")
 
             done()
         })

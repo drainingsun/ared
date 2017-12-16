@@ -110,23 +110,14 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
         ared3.exec("set", [key, "bar"], (error, result) => {
             ared3.debug = false
 
-            for (let path in error) {
-                if (error.hasOwnProperty(path)) {
-                    if (-1 !== path.indexOf("s1")) {
-                        (error[path] === null).should.be.false()
-                    }
-                }
-            }
+            const error1 = JSON.parse(error[`${key}.s2.${key}.r3`])
+            const error2 = JSON.parse(error[`${key}.s1`])
 
-            for (let path in result) {
-                if (result.hasOwnProperty(path)) {
-                    if (-1 !== path.indexOf("s1")) {
-                        (result[path] === null).should.be.true()
-                    } else {
-                        result[path].should.be.equal("OK")
-                    }
-                }
-            }
+            error1.code.should.be.equal("NR_CLOSED")
+            error2.code.should.be.equal("ECONNREFUSED")
+
+            result[`${key}.s2.${key}.r4`].should.be.equal("OK")
+            ;(result[`${key}.s1`] === null).should.be.true()
 
             done()
         })

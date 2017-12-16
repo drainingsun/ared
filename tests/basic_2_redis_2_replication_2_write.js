@@ -48,11 +48,7 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
 
             ;(error === null).should.be.true()
 
-            for (let path in result) {
-                if (result.hasOwnProperty(path)) {
-                    result[path].should.be.equal("OK")
-                }
-            }
+            result[key].should.be.equal("OK")
 
             done()
         })
@@ -65,11 +61,7 @@ describe("BASIC 2x REDIS 2x REPLICATION 2x WRITE", () => {
             ared.exec("get", [key], (error, result) => {
                 (error === null).should.be.true()
 
-                for (let path in result) {
-                    if (result.hasOwnProperty(path)) {
-                        result[path].should.be.equal("bar")
-                    }
-                }
+                result[key].should.be.equal("bar")
 
                 done()
             })
