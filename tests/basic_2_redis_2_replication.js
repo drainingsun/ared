@@ -5,8 +5,6 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
-const Helper = require(`${__base}libs/helper`)
-
 const ared = new (require(`${__base}libs/index`))()
 
 describe("BASIC 2x REDIS 2x REPLICATION", () => {
@@ -48,17 +46,9 @@ describe("BASIC 2x REDIS 2x REPLICATION", () => {
         ared.exec("set", [key, "bar"], (error, result) => {
             Object.keys(result).length.should.be.equal(1)
 
-            for (let path in Helper.flatten(error)) {
-                if (error.hasOwnProperty(path)) {
-                    (error[path] === null).should.be.true()
-                }
-            }
+            ;(error === null).should.be.true()
 
-            for (let path in Helper.flatten(result)) {
-                if (result.hasOwnProperty(path)) {
-                    result[path].should.be.equal("bar")
-                }
-            }
+            result[key].should.be.equal("OK")
 
             done()
         })

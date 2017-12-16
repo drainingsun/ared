@@ -5,8 +5,6 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
-const Helper = require(`${__base}libs/helper`)
-
 const ared = new (require(`${__base}libs/index`))()
 
 describe("BASIC 2x REDIS", () => {
@@ -42,19 +40,15 @@ describe("BASIC 2x REDIS", () => {
     it("Should set 'foo' with value 'bar' to second server", (done) => {
         const key = "foo"
 
-        ared.exec("set", [key, "bar"], (error, result) => {
-            for (let path in Helper.flatten(error)) {
-                if (error.hasOwnProperty(path)) {
-                    (error[path] === null).should.be.true()
-                }
-            }
+        ared.debug = true
 
-            for (let path in Helper.flatten(result)) {
-                if (result.hasOwnProperty(path)) {
-                    path.should.be.equal(`${key}.r1`)
-                    result[path].should.be.equal("OK")
-                }
-            }
+        ared.exec("set", [key, "bar"], (error, result) => {
+            ared.debug = false
+
+            ;(error === null).should.be.true()
+
+            ;(typeof result[`${key}.r1`] !== "undefined").should.be.true()
+            result[`${key}.r1`].should.be.equal("OK")
 
             done()
         })
@@ -65,17 +59,9 @@ describe("BASIC 2x REDIS", () => {
 
         ared.exec("set", [key, "bar"], () => {
             ared.exec("get", [key], (error, result) => {
-                for (let path in Helper.flatten(error)) {
-                    if (error.hasOwnProperty(path)) {
-                        (error[path] === null).should.be.true()
-                    }
-                }
+                (error === null).should.be.true()
 
-                for (let path in Helper.flatten(result)) {
-                    if (result.hasOwnProperty(path)) {
-                        result[path].should.be.equal("bar")
-                    }
-                }
+                result[key].should.be.equal("bar")
 
                 done()
             })
@@ -87,13 +73,9 @@ describe("BASIC 2x REDIS", () => {
         const key = "bar"
 
         ared.exec("pfcount", [[key]], (error, result) => {
-            for (let path in Helper.flatten(error)) {
-                if (error.hasOwnProperty(path)) {
-                    (error[path] === null).should.be.true()
-                }
-            }
+            (error === null).should.be.true()
 
-            (result === null).should.be.true()
+            ;(result === null).should.be.true()
 
             done()
         })
@@ -105,11 +87,7 @@ describe("BASIC 2x REDIS", () => {
 
         ared.exec("pfadd", [key, "foo"], () => {
             ared.exec("pfcount", [[key, key2]], (error, result) => {
-                for (let path in Helper.flatten(error)) {
-                    if (error.hasOwnProperty(path)) {
-                        (error[path] === null).should.be.true()
-                    }
-                }
+                (error === null).should.be.true()
 
                 result.should.be.equal(1)
 
@@ -125,11 +103,7 @@ describe("BASIC 2x REDIS", () => {
         ared.exec("pfadd", [key, "foo"], () => {
             ared.exec("pfadd", [key2, "bar"], () => {
                 ared.exec("pfcount", [[key, key2]], (error, result) => {
-                    for (let path in Helper.flatten(error)) {
-                        if (error.hasOwnProperty(path)) {
-                            (error[path] === null).should.be.true()
-                        }
-                    }
+                    (error === null).should.be.true()
 
                     result.should.be.equal(2)
 
@@ -146,11 +120,7 @@ describe("BASIC 2x REDIS", () => {
         ared.exec("set", [key, "foo"], () => {
             ared.exec("set", [key2, "bar"], () => {
                 ared.exec("mget", [[key, key2]], (error, result) => {
-                    for (let path in Helper.flatten(error)) {
-                        if (error.hasOwnProperty(path)) {
-                            (error[path] === null).should.be.true()
-                        }
-                    }
+                    (error === null).should.be.true()
 
                     Object.keys(result).length.should.be.equal(2)
                     result[key].should.be.equal("foo")

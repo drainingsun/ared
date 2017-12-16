@@ -39,7 +39,10 @@ class Helper {
 
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
-                if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+
+                if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])
+                    && !Buffer.isBuffer(obj[key])) {
+
                     const flatObject = Helper.flatten(obj[key])
 
                     for (let x in flatObject) {

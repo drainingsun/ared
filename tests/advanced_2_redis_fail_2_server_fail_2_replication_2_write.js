@@ -13,8 +13,6 @@ global.__base = __dirname + "/../"
 const redis = require("redis")
 const should = require("should") // eslint-disable-line no-unused-vars
 
-const Helper = require(`${__base}libs/helper`)
-
 const ared = new (require(`${__base}libs/index`))()
 const ared2 = new (require(`${__base}libs/index`))()
 const ared3 = new (require(`${__base}libs/index`))()
@@ -22,12 +20,12 @@ const ared3 = new (require(`${__base}libs/index`))()
 describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
     const serverOptions = {
         host: "127.0.0.1",
-        port: 6828
+        port: 6826
     }
 
     const server2Options = {
         host: "127.0.0.1",
-        port: 6829
+        port: 6827
     }
 
     const redisOptions = {
@@ -63,11 +61,11 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
     const forwardingOptions = {
         s1: {
             host: "127.0.0.1",
-            port: 6828
+            port: 6826
         },
         s2: {
             host: "127.0.0.1",
-            port: 6829
+            port: 6827
         }
     }
 
@@ -90,9 +88,13 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
         }
 
         ared.listen(serverOptions, redisOptions, null, () => {
+            ared._clients["r1"].quit()
+            ared._clients["r2"].quit()
             ared._server.close()
 
             ared2.listen(server2Options, redis2Options, null, () => {
+                ared2._clients["r3"].quit()
+
                 ared3.listen(null, null, forwardingOptions, () => {
                     done()
                 })
@@ -103,23 +105,25 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
     it("Should set 'foo' with value 'bar' for the remaining server and redis", (done) => {
         const key = "foo"
 
+        ared3.debug = true
+
         ared3.exec("set", [key, "bar"], (error, result) => {
-            for (let path in Helper.flatten(error)) {
+            ared3.debug = false
+
+            for (let path in error) {
                 if (error.hasOwnProperty(path)) {
-                    if (-1 !== path.indexOf("s2")) {
-                        (error[path] === null).should.be.true()
-                    } else {
+                    if (-1 !== path.indexOf("s1")) {
                         (error[path] === null).should.be.false()
                     }
                 }
             }
 
-            for (let path in Helper.flatten(result)) {
+            for (let path in result) {
                 if (result.hasOwnProperty(path)) {
                     if (-1 !== path.indexOf("s1")) {
-                        (error[path] === null).should.be.true()
+                        (result[path] === null).should.be.true()
                     } else {
-                        (error[path] === null).should.be.equal("OK")
+                        result[path].should.be.equal("OK")
                     }
                 }
             }
@@ -133,17 +137,9 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
 
         ared3.exec("set", [key, "bar"], () => {
             ared3.exec("get", [key], (error, result) => {
-                for (let path in Helper.flatten(error)) {
-                    if (error.hasOwnProperty(path)) {
-                        (error[path] === null).should.be.true()
-                    }
-                }
+                (error === null).should.be.true()
 
-                for (let path in Helper.flatten(result)) {
-                    if (result.hasOwnProperty(path)) {
-                        result[path].should.be.equal("bar")
-                    }
-                }
+                result[key].should.be.equal("bar")
 
                 done()
             })
