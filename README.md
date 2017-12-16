@@ -51,8 +51,21 @@ All single key commands should work. Multi key commands (remember, keys can be o
 logic which is yet to be implemented, with the exception of MGET and PFCOUNT, which are supported. 
 
 
+## Errors and results
+Only last errors are returned and only on write commands if some of the nodes fail. Reads will only return an error if
+there's a complete cluster failure for the specified key. 
+
+Both errors and results have keys associated with them. In case of errors, the keys will depend on the depth of the 
+architecture. For example, a 3 layer architecture 
+(as in `advanced_2_redis_fail_2_server_fail_2_replication_2_write.js`), for a key `foo`, error key will be 
+`foo.s*.foo.r*` which can be translated to key trying to access server `s*` and redis `r*`. In case of results, the 
+key(s) is what you supplied (as in `result[key]`).
+
+While this can be confusing and different from plain redis client, in order to have unlimited depth architecture of 
+ARed. To make things easier, they keys are flattened to only one object level. 
+
 ## Testing
-NOTE: Requires Redis to be installed (up to 4 instances for full testing)
+NOTE: Requires Redis (localhost and ports 6379-6832) to be installed (4 instances for full testing)
 ```bash
 npm test
 ```
