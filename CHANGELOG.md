@@ -1,3 +1,6 @@
+# 2017-12-15, v0.1.7
+* Rewrote error logging system and tests
+
 # 2017-12-15, v0.1.6
 * Made sure `Helper.flatten` doesn't ignore empty arrays
 
