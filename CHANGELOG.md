@@ -1,3 +1,6 @@
+# 2017-12-17, v0.1.8
+* Changed Redis error from JSON.stringify to toString for better readability
+
 # 2017-12-15, v0.1.7
 * Rewrote error logging system and tests
 

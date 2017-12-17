@@ -213,7 +213,7 @@ class ARed extends Commands {
         if (client.constructor.name === "RedisClient") {
             client.send_command(command, args, (error, result) => {
                 if (error) {
-                    error = JSON.stringify(error)
+                    error = error.toString()
                 }
 
                 if (isRead) {
