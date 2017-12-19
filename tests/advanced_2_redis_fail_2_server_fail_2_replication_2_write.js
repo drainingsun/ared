@@ -110,10 +110,10 @@ describe("ADVANCED 2x REDIS 2x SERVER FAIL 2x REPLICATION 2x WRITE", () => {
         ared3.exec("set", [key, "bar"], (error, result) => {
             ared3.debug = false
 
-            const error1 = JSON.parse(error[`${key}.s2.${key}.r3`])
+            const error1 = error[`${key}.s2.${key}.r3`]
             const error2 = JSON.parse(error[`${key}.s1`])
 
-            error1.code.should.be.equal("NR_CLOSED")
+            error1.should.be.equal("AbortError: SET can't be processed. The connection is already closed.")
             error2.code.should.be.equal("ECONNREFUSED")
 
             result[`${key}.s2.${key}.r4`].should.be.equal("OK")

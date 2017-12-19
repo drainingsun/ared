@@ -11,6 +11,15 @@ architecture than the two above. It's based on [Rendezvous Hashing](https://en.w
 and (if used with replication) contrary to the traditional master->slave architecture it is a multi-master one. In 
 addition to that, ARed is also stateless which greatly simplifies configuration and maintenance of the cluster.
 
+For more information, please read [What is ARed (Redis scaling solution): The theory](https://medium.com/@drainingsun/what-is-ared-redis-scaling-solution-the-theory-178cf9e9b738)
+
+## REQUIREMENTS
+* Node.js v8+
+* Redis v4+
+
+## INSTALLATION
+`npm install ared`
+
 ## USAGE:
 
 2 Redis instances. Data is distributed randomly 50/50. If replication is enabled, reads are also split 50/50.
@@ -62,7 +71,16 @@ architecture. For example, a 3 layer architecture
 key(s) is what you supplied (as in `result[key]`).
 
 While this can be confusing and different from plain redis client, in order to have unlimited depth architecture of 
-ARed. To make things easier, they keys are flattened to only one object level. 
+ARed this is required. Take note, to make things easier, they keys are flattened to only one object level. 
+
+## Rebalancing
+Currently, if a node is removed or added, data will not migrate automatically. This shouldn't be a problem if you're 
+using ARed as a cache and not object storage system. But if you do, there's a tool (`tools/rebalancer.js`) provided to 
+rebalance the cluster. It's not very efficient at the moment but it does the job. Just one caveat - you shouldn't do 
+rebalance online, otherwise expect missing and overwritten data. In the future I might create an online rebalancer, but
+it's not on top of the priority list. Why? Because it's hard. Migrating data while there are reads and writes to it 
+requires ridiculous amount of complexity which currently doesn't fit into the overall project (translation: I have no 
+clue how to create a simple and elegant solution. Help?)
 
 ## Testing
 NOTE: Requires Redis (localhost and ports 6379-6832) to be installed (4 instances for full testing)
@@ -75,7 +93,10 @@ npm test
 npm run lint
 ```
 
+## Contributing
+Go nuts! Just don't forget to test and lint. Credit will be given where it's due.
+
 ## Future
 * More examples
 * Benchmarks
-* Guide that actually tries to explain the inner workings and power of ARed!
+* Lots of fixes and optimizations

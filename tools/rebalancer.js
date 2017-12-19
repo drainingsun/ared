@@ -10,6 +10,7 @@ const Helper = require(`${__base}libs/helper`)
 class Rebalancer {
     constructor(redisOptions) {
         this.concurrency = 100
+        this.replication = 2
 
         this._clients = {}
 
@@ -50,10 +51,22 @@ class Rebalancer {
             for (let i = 0; i < keys.length; i++) {
                 const key = keys[i]
 
-                const clients = Helper.getClients(this._clients, key, 1)
+                const clients = Helper.getClients(this._clients, key, this.replication)
 
-                if (clients[0][0] !== id) {
-                    keysToMove.push([clients[0][0], key])
+                let type = "REPLACE"
+
+                for (let i = 0; i < clients.length; i++) {
+                    if (clients[i][0] === id) {
+                        type = "COPY"
+
+                        break
+                    }
+                }
+
+                for (let i = 0; i < clients.length; i++) {
+                    if (clients[i][0] !== id) {
+                        keysToMove.push([clients[i][0], key, type])
+                    }
                 }
             }
 
@@ -63,13 +76,12 @@ class Rebalancer {
                     this._clients[key[0]].options.port,
                     key[1],
                     0,
-                    5000
+                    5000,
+                    key[2]
                 ]
 
                 this._clients[id].migrate(command, (err) => {
-                    if (err) {
-                        console.log(err) // eslint-disable-line no-console
-                    } else {
+                    if (!err) {
                         movedCount++
                     }
 

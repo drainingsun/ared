@@ -1,3 +1,8 @@
+# 2017-12-19, v0.1.9
+* Fixed Redis error in test
+* Fixed Rebalancer to support replication
+* Updated README.md
+
 # 2017-12-17, v0.1.8
 * Changed Redis error from JSON.stringify to toString for better readability
 

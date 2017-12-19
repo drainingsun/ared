@@ -64,34 +64,38 @@ describe("REBALANCER NODE ADD", () => {
 
     it("Do rebalance", (done) => {
         rebalancer.start(() => {
-            for (let client in redisClients) {
-                redisClients[client].send_command("DBSIZE", (error, result) => {
+            let x = Object.keys(redisClients).length
+
+            for (let clientId in redisClients) {
+                redisClients[clientId].send_command("DBSIZE", (error, result) => {
                     if (error) {
                         throw error
                     }
 
-                    switch (client) {
+                    switch (clientId) {
                         case "r1": {
-                            result.should.be.equal(2821)
+                            result.should.be.equal(5870)
                             break
                         }
                         case "r2": {
-                            result.should.be.equal(3062)
+                            result.should.be.equal(6008)
                             break
                         }
                         case "r3": {
-                            result.should.be.equal(2998)
+                            result.should.be.equal(6005)
                             break
                         }
                         case "r4": {
-                            result.should.be.equal(3119)
+                            result.should.be.equal(6117)
                             break
                         }
                     }
+
+                    if (--x === 0) {
+                        done()
+                    }
                 })
             }
-
-            done()
         })
     })
 })
