@@ -15,7 +15,7 @@ For more information, please read [What is ARed (Redis scaling solution): The th
 
 ## REQUIREMENTS
 * Node.js v8+
-* Redis v4+
+* Redis v6+
 
 ## INSTALLATION
 `npm install ared`

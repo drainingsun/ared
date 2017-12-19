@@ -11,7 +11,7 @@
     ],
     "author": "Draining Sun",
     "license": "MIT",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "main": "libs",
     "engines": {
         "node": ">=6"
