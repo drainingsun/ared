@@ -14,8 +14,8 @@ addition to that, ARed is also stateless which greatly simplifies configuration 
 For more information, please read [What is ARed (Redis scaling solution): The theory](https://medium.com/@drainingsun/what-is-ared-redis-scaling-solution-the-theory-178cf9e9b738)
 
 ## REQUIREMENTS
-* Node.js v8+
-* Redis v6+
+* Node.js v6+
+* Redis v4+
 
 ## INSTALLATION
 `npm install ared`
