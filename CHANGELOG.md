@@ -1,3 +1,8 @@
+# 2018-01-05, v0.2.0
+* Added benchmark
+* Added ability to change separator for error and result objects
+* Updated README.md
+
 # 2017-12-19, v0.1.9
 * Fixed Redis error in test
 * Fixed Rebalancer to support replication

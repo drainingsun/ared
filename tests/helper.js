@@ -66,7 +66,7 @@ describe("HELPER", () => {
             g: []
         }
 
-        const flatObject = Helper.flatten(object)
+        const flatObject = Helper.flatten(object, ".")
 
         ;(flatObject["a.b"] === null).should.be.true()
         flatObject["c.d"].should.be.equal("foo")

@@ -14,6 +14,7 @@ class ARed extends Commands {
         this.replication = 1 // 1 - no replication, 2..n - replication factor
         this.writePolicy = 1 // 0 - don't wait at all, 1..n - wait for x replications
         this.debug = false // if true, will return full path of the key (same as errors)
+        this.separator = "." // Reserved for error and result flattening. Change this if your keys have dots in them.
 
         this._agent = new http.Agent({keepAlive: true})
 
@@ -117,19 +118,19 @@ class ARed extends Commands {
 
             this._scatter(command, args, this.writePolicy, (errors, results) => {
                 if (firstCall) {
-                    errors = Helper.flatten(errors)
+                    errors = Helper.flatten(errors, this.separator)
 
                     if (Object.keys(errors).length === 0) {
                         errors = null
                     }
 
-                    results = Helper.flatten(results)
+                    results = Helper.flatten(results, this.separator)
 
                     let preparedResults = {}
 
                     if (!this.debug) {
                         for (let path in results) {
-                            preparedResults[path.split(".")[0]] = results[path]
+                            preparedResults[path.split(this.separator)[0]] = results[path]
                         }
                     } else {
                         preparedResults = results
@@ -257,7 +258,7 @@ class ARed extends Commands {
                     if (isRead) {
                         const nextClientId = clientId + 1
 
-                        const error = Helper.flatten(parsed[0])
+                        const error = Helper.flatten(parsed[0], this.separator)
 
                         let errorFound = false
 

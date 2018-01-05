@@ -34,20 +34,19 @@ class Helper {
         return range
     }
 
-    static flatten(obj) {
+    static flatten(obj, separator) {
         const toReturn = {}
 
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
-
                 if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])
                     && !Buffer.isBuffer(obj[key])) {
 
-                    const flatObject = Helper.flatten(obj[key])
+                    const flatObject = Helper.flatten(obj[key], separator)
 
                     for (let x in flatObject) {
                         if (flatObject.hasOwnProperty(x)) {
-                            toReturn[key + "." + x] = flatObject[x]
+                            toReturn[key + separator + x] = flatObject[x]
                         }
                     }
                 } else {

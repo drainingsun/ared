@@ -67,7 +67,7 @@ class Commands {
                 aggregatedErrors["dump"] = errors
             }
 
-            results = Helper.flatten(results)
+            results = Helper.flatten(results, this.separator)
 
             // Get the one shard needed
             const baseKey = `${this.prefix}_${Date.now()}_${Math.random()}`
@@ -92,7 +92,7 @@ class Commands {
                                 aggregatedErrors["del"] = errors
                             }
 
-                            aggregatedErrors = Helper.flatten(aggregatedErrors)
+                            aggregatedErrors = Helper.flatten(aggregatedErrors, this.separator)
 
                             if (Object.keys(aggregatedErrors).length === 0) {
                                 aggregatedErrors = null
@@ -102,7 +102,7 @@ class Commands {
                         })
                     })
                 } else {
-                    aggregatedErrors = Helper.flatten(aggregatedErrors)
+                    aggregatedErrors = Helper.flatten(aggregatedErrors, this.separator)
 
                     if (Object.keys(aggregatedErrors).length === 0) {
                         aggregatedErrors = null
@@ -116,13 +116,13 @@ class Commands {
 
     mget(args, callback) {
         this._scatter("get", args, this.writePolicy, (errors, results) => {
-            errors = Helper.flatten(errors)
+            errors = Helper.flatten(errors, this.separator)
 
             if (Object.keys(errors).length === 0) {
                 errors = null
             }
 
-            results = Helper.flatten(results)
+            results = Helper.flatten(results, this.separator)
 
             let preparedResults = {}
 
