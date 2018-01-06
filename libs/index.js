@@ -29,52 +29,48 @@ class ARed extends Commands {
             throw new Error("You need to supply at least serverOptions, redisOptions or forwardingOptions.")
         }
 
-        let async = 0
+        let x = 0
 
         if (forwardingOptions) {
-            async += Object.keys(forwardingOptions).length
+            x += Object.keys(forwardingOptions).length
 
             for (let id in forwardingOptions) {
-                if (forwardingOptions.hasOwnProperty(id)) {
-                    this._clients[id] = forwardingOptions[id]
+                this._clients[id] = forwardingOptions[id]
 
-                    if (--async === 0) {
-                        if (callback) {
-                            return callback()
-                        }
+                if (--x === 0) {
+                    if (callback) {
+                        return callback()
                     }
                 }
             }
         }
 
         if (redisOptions) {
-            async += Object.keys(redisOptions).length
+            x += Object.keys(redisOptions).length
 
             for (let id in redisOptions) {
-                if (redisOptions.hasOwnProperty(id)) {
-                    const client = redis.createClient(redisOptions[id])
+                const client = redis.createClient(redisOptions[id])
 
-                    client.on("error", (error) => {
-                        this.redisErrors[id] = error
-                    })
+                client.on("error", (error) => {
+                    this.redisErrors[id] = error
+                })
 
-                    client.on("ready", () => {
-                        delete this.redisErrors[id]
+                client.on("ready", () => {
+                    delete this.redisErrors[id]
 
-                        if (--async === 0) {
-                            if (callback) {
-                                return callback()
-                            }
+                    if (--x === 0) {
+                        if (callback) {
+                            return callback()
                         }
-                    })
+                    }
+                })
 
-                    this._clients[id] = client
-                }
+                this._clients[id] = client
             }
         }
 
         if (serverOptions) {
-            async++
+            x++
 
             this._server = http.createServer((req, res) => {
                 let body = ""
@@ -97,7 +93,7 @@ class ARed extends Commands {
             })
 
             this._server.listen(serverOptions, () => {
-                if (--async === 0) {
+                if (--x === 0) {
                     if (callback) {
                         return callback()
                     }
@@ -112,12 +108,12 @@ class ARed extends Commands {
         if (typeof this[command] !== "undefined") {
             this[command](args, callback)
         } else {
-            if (Array.isArray(args[0])) {
+            if (Array.isArray(args[0]) === true) {
                 throw new Error(`Command ${command} is currently not supported with multi keys.`)
             }
 
             this._scatter(command, args, this.writePolicy, (errors, results) => {
-                if (firstCall) {
+                if (firstCall === true) {
                     errors = Helper.flatten(errors, this.separator)
 
                     if (Object.keys(errors).length === 0) {
@@ -128,7 +124,7 @@ class ARed extends Commands {
 
                     let preparedResults = {}
 
-                    if (!this.debug) {
+                    if (this.debug === false) {
                         for (let path in results) {
                             preparedResults[path.split(this.separator)[0]] = results[path]
                         }
@@ -145,7 +141,7 @@ class ARed extends Commands {
     }
 
     _scatter(command, args, writePolicy, callback) {
-        const keys = Array.isArray(args[0]) ? args[0] : [args[0]]
+        const keys = (Array.isArray(args[0]) === true) ? args[0] : [args[0]]
 
         const isRead = this._readCommands[command] || false
 
@@ -160,7 +156,7 @@ class ARed extends Commands {
 
             const clients = Helper.getClients(this._clients, keys[i], this.replication)
 
-            if (isRead) {
+            if (isRead === true) {
                 this._send(clients, 0, isRead, command, args, (error, result, clientId) => {
                     if (error) {
                         if (typeof errors[keys[i]] === "undefined") {
@@ -217,7 +213,7 @@ class ARed extends Commands {
                     error = error.toString()
                 }
 
-                if (isRead) {
+                if (isRead === true) {
                     const nextClientId = clientId + 1
 
                     if (error && nextClientId < this.replication) {
@@ -255,7 +251,7 @@ class ARed extends Commands {
                 res.on("end", () => {
                     const parsed = JSON.parse(body)
 
-                    if (isRead) {
+                    if (isRead === true) {
                         const nextClientId = clientId + 1
 
                         const error = Helper.flatten(parsed[0], this.separator)
@@ -263,14 +259,12 @@ class ARed extends Commands {
                         let errorFound = false
 
                         for (let path in error) {
-                            if (error.hasOwnProperty(path)) {
-                                if (error[path]) {
-                                    errorFound = true
-                                }
+                            if (error[path]) {
+                                errorFound = true
                             }
                         }
 
-                        if (errorFound && nextClientId < this.replication) {
+                        if (errorFound === true && nextClientId < this.replication) {
                             this._send(clients, nextClientId, isRead, command, args, callback)
                         } else {
                             return callback(parsed[0], parsed[1], clientId)
@@ -286,7 +280,7 @@ class ARed extends Commands {
                     error = JSON.stringify(error)
                 }
 
-                if (isRead) {
+                if (isRead === true) {
                     const nextClientId = clientId + 1
 
                     if (error && nextClientId < this.replication) {

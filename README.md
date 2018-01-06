@@ -89,16 +89,16 @@ There's a primitive tool (`tools/benchmark.js`) to check how big of a penalty do
 client. Here's the result dump (Intel® Core™ i7-6700 Quad-Core server, and each run sends 16 commands with random key):
 
 ```text
-Raw Redis Set x 8,950 ops/sec ±0.87% (128 runs sampled)
-Raw Redis Get x 8,873 ops/sec ±0.71% (127 runs sampled)
-Basic 1 Redis Set x 3,884 ops/sec ±0.94% (122 runs sampled)
-Basic 1 Redis Get x 3,655 ops/sec ±1.01% (126 runs sampled)
-Basic 2 Redis Set x 2,964 ops/sec ±0.98% (124 runs sampled)
-Basic 2 Redis Get x 3,013 ops/sec ±1.09% (123 runs sampled)
-Basic 4 Redis Set x 2,989 ops/sec ±0.83% (124 runs sampled)
-Basic 4 Redis Get x 3,031 ops/sec ±1.18% (124 runs sampled)
-Basic 4 Redis 2x Replication 2x Write Set x 2,083 ops/sec ±1.00% (124 runs sampled)
-Basic 4 Redis 2x Replication 2x Write Get x 2,982 ops/sec ±1.12% (122 runs sampled)
+Raw Redis Set x 10,589 ops/sec ±1.35% (128 runs sampled)
+Raw Redis Get x 9,893 ops/sec ±0.80% (128 runs sampled)
+Basic 1 Redis Set x 5,133 ops/sec ±0.80% (126 runs sampled)
+Basic 1 Redis Get x 5,101 ops/sec ±0.84% (126 runs sampled)
+Basic 2 Redis Set x 4,013 ops/sec ±0.89% (124 runs sampled)
+Basic 2 Redis Get x 4,007 ops/sec ±0.79% (125 runs sampled)
+Basic 4 Redis Set x 4,074 ops/sec ±0.87% (126 runs sampled)
+Basic 4 Redis Get x 3,996 ops/sec ±0.98% (124 runs sampled)
+Basic 4 Redis 2x Replication 2x Write Set x 2,677 ops/sec ±0.84% (126 runs sampled)
+Basic 4 Redis 2x Replication 2x Write Get x 3,996 ops/sec ±0.97% (124 runs sampled)
 
 ```
 
@@ -106,24 +106,24 @@ Before jumping in, keep in mind, Redis instances where not even close to being s
 so any benefit of scaling out is drowned in the fact that the client could not produce the necessary input to see how 
 scaling reduces the load. 
 
-Moving on, to no big surprise, if you just use 1 Redis instance and use Ared for it, expect it to be ~55-60% slower. 
-Things get more interesting if you start to scale though. 2 Redis on Ared, compared to 1, incur ~25% on SET and ~15% on 
-GET commands. But at the same time if you use 4 Redis, the difference between the former result and the latter is non 
+Moving on, to no big surprise, if you just use 1 Redis instance and use Ared for it, expect it to be ~50% slower. 
+Things get more interesting if you start to scale though. 2 Redis on Ared, compared to 1, incur an extra ~20% for both 
+commands. But at the same time if you use 4 Redis, the difference between the former result and the latter is non 
 existent. This is great news! Meaning, adding instances does not cause a noticeable slowdown. But this is not the full 
-picture. If you check the last two rows with replication, you can see that writes slowdown significantly (~30%). This is 
+picture. If you check the last two rows with replication, you can see that writes slowdown significantly (~33%). This is 
 because replication is done from the client side, which means writes are done, even if in parallel, twice. It doesn't 
 affect reads though, since only one instance need to be read. I've also tried using 4x replication to see how worse it 
-performs compared to 2x. As expected, reads stayed the same, but writes dropped ~55%. 
+performs compared to 2x. As expected, reads stayed the same, but writes dropped ~60% compared to no replication. 
 
-From this, we can safely draw some conclusions. One, ARed has a significant performance penalty compared to vanilla 
+From this we can safely draw some conclusions. One, ARed has a significant performance penalty compared to vanilla 
 Redis client. Two, it also has a performance penalty moving from 1 to 2 instances, but after that both writes and reads 
 stay more or less on the same level. Three, replication factor causes write performance penalty.
 
 To sum it up ARed performance penalties are:
 
-* 1 Redis - ~55% for reads, ~60% for writes. (Vanilla is 2.3x/2.4x faster)
-* 2 Redis - ~65% for reads/writes. (Vanilla is 3x faster)
-* 4 Redis (2x replication) - ~65% for reads, ~75% for writes (Vanilla is 3x/4.3x faster)
+* 1 Redis - ~50% for reads/writes. (Vanilla is 2x faster)
+* 2 Redis - ~60% for reads/writes. (Vanilla is 2.5x faster)
+* 4 Redis (2x replication) - ~60% for reads, ~75% for writes (Vanilla is 2.5x/3.75x faster)
 
 There's but one thing that still needs benchmarking. The performance of ARed on a multi-layer architecture. Stay tuned 
 for updates on this!

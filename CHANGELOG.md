@@ -1,3 +1,9 @@
+# 2018-01-06, v0.2.1
+* Did some micro optimizations to improve performance a little
+* Updated benchmark results to reflect code changes and bench setup
+* Improved code consistency
+* Updated README.md
+
 # 2018-01-05, v0.2.0
 * Added benchmark
 * Added ability to change separator for error and result objects

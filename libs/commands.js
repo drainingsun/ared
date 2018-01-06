@@ -126,9 +126,9 @@ class Commands {
 
             let preparedResults = {}
 
-            if (!this.debug) {
+            if (this.debug === false) {
                 for (let path in results) {
-                    preparedResults[path.split(".")[0]] = results[path]
+                    preparedResults[path.split(this.separator)[0]] = results[path]
                 }
             } else {
                 preparedResults = results

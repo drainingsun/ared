@@ -44,8 +44,8 @@ const basic2Ared = new Ared()
 const basic4Ared = new Ared()
 const basic4Ared2Replication2Write = new Ared()
 
-basic4Ared2Replication2Write.replication = 2
-basic4Ared2Replication2Write.writePolicy = 2
+basic4Ared2Replication2Write.replication = 4
+basic4Ared2Replication2Write.writePolicy = 4
 
 async.parallel([
     (callback) => {

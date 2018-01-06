@@ -7,14 +7,16 @@ class Helper {
         let selectedClients = []
 
         for (let id in clients) {
-            if (clients.hasOwnProperty(id)) {
-                selectedClients.push([id, murmurhash.murmurHash64(id + key)])
-            }
+            selectedClients.push([id, murmurhash.murmurHash64(id + key)])
         }
 
-        selectedClients = selectedClients.sort((a, b) => (a[1] > b[1]) - (a[1] < b[1]))
+        selectedClients = selectedClients.sort(Helper._sort)
 
         return Helper._shuffle(selectedClients.slice(0, replication))
+    }
+
+    static _sort(a, b) {
+        return (a[1] > b[1]) - (a[1] < b[1])
     }
 
     static _shuffle(range) {
@@ -38,20 +40,16 @@ class Helper {
         const toReturn = {}
 
         for (let key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])
-                    && !Buffer.isBuffer(obj[key])) {
+            if (typeof obj[key] === "object" && obj[key] !== null && Array.isArray(obj[key]) === false
+                && Buffer.isBuffer(obj[key]) === false) {
 
-                    const flatObject = Helper.flatten(obj[key], separator)
+                const flatObject = Helper.flatten(obj[key], separator)
 
-                    for (let x in flatObject) {
-                        if (flatObject.hasOwnProperty(x)) {
-                            toReturn[key + separator + x] = flatObject[x]
-                        }
-                    }
-                } else {
-                    toReturn[key] = obj[key]
+                for (let x in flatObject) {
+                    toReturn[key + separator + x] = flatObject[x]
                 }
+            } else {
+                toReturn[key] = obj[key]
             }
         }
 
