@@ -84,6 +84,10 @@ it's not on top of the priority list. Why? Because it's hard. Migrating data whi
 requires ridiculous amount of complexity which currently doesn't fit into the overall project (translation: I have no 
 clue how to create a simple and elegant solution. Help?)
 
+WARNING: Take care with rebalancing when you re-add a node that has dropped out due to failure and you have replication 
+turned on. This means - you need to either manually flush the node being re-added or use `flush = true` in the 
+rebalancer redisOptions. See `tests/rebalancer.js` for an example.
+
 ## Benchmarks
 There's a primitive tool (`tools/benchmark.js`) to check how big of a penalty does ARed cause compared to vanilla Redis 
 client. Here's the result dump (Intel® Core™ i7-6700 Quad-Core server, and each run sends 16 commands with random key):

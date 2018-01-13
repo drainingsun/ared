@@ -10,13 +10,17 @@ const Helper = require(`${__base}libs/helper`)
 class Rebalancer {
     constructor(redisOptions) {
         this.concurrency = 100
-        this.replication = 2
+        this.replication = 1
 
         this._clients = {}
 
         for (let id in redisOptions) {
-            if (redisOptions.hasOwnProperty(id)) {
-                this._clients[id] = redis.createClient(redisOptions[id])
+            this._clients[id] = redis.createClient(redisOptions[id])
+
+            if (redisOptions[id].flush === true) {
+                this._clients[id].on("ready", () => {
+                    this._clients[id].send_command("FLUSHALL")
+                })
             }
         }
     }

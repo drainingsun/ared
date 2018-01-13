@@ -1,3 +1,9 @@
+# 2018-01-13, v0.2.2
+* Added option in rebalancer to flush an instance that has dropped out. Read more in README.md
+* Improved rebalancer testing
+* Updated license 
+* Updated README.md
+
 # 2018-01-06, v0.2.1
 * Did some micro optimizations to improve performance a little
 * Updated benchmark results to reflect code changes and bench setup
